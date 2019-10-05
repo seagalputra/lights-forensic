@@ -2,7 +2,7 @@ function [objMask, objGray, out] = imsegment(image, varargin)
     % DEFAULT PARAMETER
     defaultNColors = 2;
     defaultNReplicates = 3;
-    defaultThreshold = 500;
+    defaultThreshold = 1000;
     defaultSegType = 'kmeans';
     % validate function input parameter
     parser = inputParser;
@@ -24,13 +24,13 @@ function [objMask, objGray, out] = segmentImage(params)
     switch params.segType
         case 'kmeans'
             mask = kmeansSegmentation(params.image, params.nColors, ...
-                params.numReplicates);
+                params.numReplicates, params.sizeThreshold);
         case 'thresh'
             mask = colorThreshold(params.image);
     end
     
     % create bounding box and obtain properties of the image
-    [center, radius, boxProps] = getBinaryProps(mask, params.sizeThreshold);
+    [center, radius, boxProps] = getBinaryProps(mask);
     % crop every object
     [objMask, objGray] = getObjectMask(mask, gray, boxProps);
     % create struct table every properties of object
@@ -39,7 +39,7 @@ function [objMask, objGray, out] = segmentImage(params)
     out.boxProps = boxProps;
 end
 
-function binaryMask = kmeansSegmentation(image, nColors, numReplicates)
+function binaryMask = kmeansSegmentation(image, nColors, numReplicates, sizeThreshold)
     labImage = convertToLab(image);
     % reshape image into array
     ab = double(labImage(:,:,2:3));
@@ -58,6 +58,7 @@ function binaryMask = kmeansSegmentation(image, nColors, numReplicates)
     end
     % find background mask
     binaryMask = findBackground(binaryMask);
+    binaryMask = bwareaopen(binaryMask, sizeThreshold);
 end
 
 function background = findBackground(listMask)
@@ -99,14 +100,12 @@ function [objMask, objGray] = getObjectMask(binaryMask, grayImage, boxProps)
     end
 end
 
-function [center, radius, boxProps] = getBinaryProps(binaryMask, sizeThreshold)
+function [center, radius, boxProps] = getBinaryProps(binaryMask)
     center = [];
     radius = [];
     boxProps = [];
-    % filter binary mask with largest area
-    bw = bwareaopen(binaryMask, sizeThreshold);
     % calculate binary image properties
-    props = regionprops(bw, 'BoundingBox', 'Area', 'Centroid', ...
+    props = regionprops(binaryMask, 'BoundingBox', 'Area', 'Centroid', ...
         'MajorAxisLength', 'MinorAxisLength');
     for i = 1:size(props,1)
         center = [center; props(i).Centroid];
