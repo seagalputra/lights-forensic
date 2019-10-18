@@ -1,4 +1,4 @@
-function [objMask, objGray, out] = imsegment(image, varargin)
+function [objMask, objGray, mask, out] = imsegment(image, varargin)
     % DEFAULT PARAMETER
     defaultNColors = 2;
     defaultNReplicates = 3;
@@ -24,10 +24,10 @@ function [objMask, objGray, out] = imsegment(image, varargin)
     parse(parser, image, varargin{:});
     inputs = parser.Results;
     % call main logic
-    [objMask, objGray, out] = segmentImage(inputs);
+    [objMask, objGray, mask, out] = segmentImage(inputs);
 end
 
-function [objMask, objGray, out] = segmentImage(params)
+function [objMask, objGray, mask, out] = segmentImage(params)
     % convert image into grayscale
     gray = convertToGray(params.image);
     % decide which segmentation is used

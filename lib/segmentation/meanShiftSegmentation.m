@@ -1,7 +1,7 @@
 function mask = meanShiftSegmentation(rgbImage, spatialBandWidth, rangeBandWidth)
 
 % segment using mean shift
-[~, labels] = edison_wrapper(rgbImage, @rgb2lab, 'SpatialBandWidth', ...
+[~, labels] = edison_wrapper(rgbImage, @RGB2Luv, 'SpatialBandWidth', ...
     spatialBandWidth, 'RangeBandWidth', rangeBandWidth);
 
 % convert labels into binary logical image

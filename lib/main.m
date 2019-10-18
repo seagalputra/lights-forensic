@@ -6,8 +6,10 @@ img = imresize(img, 0.25);
 
 disp('Image segmentation..');
 % [obj, gray, out] = imsegment(img, 'segType', 'kmeans', 'nColors', 2);
-[obj, gray, out] = imsegment(img, 'segType', 'meanshift', ...
-    'SpatialBandWidth', 3, 'RangeBandWidth', 4.0);
+[obj, gray, mask, out] = imsegment(img, 'segType', 'meanshift', ...
+    'SpatialBandWidth', 2, 'RangeBandWidth', 2.4);
+
+imshow(mask);
 
 %% Calculate light source direction for every object
 disp('Estimate light source direction...');
