@@ -1,0 +1,10 @@
+function v = vecLight(N, intensity, lambda)
+M = blkdiag(N{:});
+M = [M ones(size(M,1),1)];
+b = intensity';
+c = {[-1 0 1 0; 0 -1 0 1]};
+c = repmat(c,1,size(N,1)/2);
+block_c = blkdiag(c{:});
+block_c = [block_c zeros(size(block_c,1),1)];
+v = pinv((M'*M) + lambda*(block_c'*block_c))*M'*b;
+v(end) = [];
