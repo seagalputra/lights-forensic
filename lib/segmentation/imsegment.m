@@ -38,8 +38,8 @@ function [objMask, objGray, mask, out] = segmentImage(params)
         case 'thresh'
             mask = colorThreshold(params.image);
         case 'meanshift'
-            mask = meanShiftSegmentation(params.image, ...
-                params.SpatialBandWidth, params.RangeBandWidth);
+            mask = meanShiftSegmentation(params.image, params.SpatialBandWidth, ...
+                params.RangeBandWidth, params.sizeThreshold);
     end
     
     % create bounding box and obtain properties of the image

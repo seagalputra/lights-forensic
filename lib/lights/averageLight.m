@@ -1,4 +1,5 @@
 function L = averageLight(v)
+v(end) = [];
 Lx = [];
 Ly = [];
 for i = 1:size(v,1)
