@@ -13,6 +13,7 @@ disp('Image segmentation..');
     'SpatialBandWidth', 2, 'RangeBandWidth', 2.4);
 
 %% Calculate light source direction for every object
+% Infinite light source model
 % disp('Estimate light source direction...');
 % for i = 1:size(obj,2)
 %     L(i,:) = lightDirection(obj{i}, gray{i});
@@ -61,7 +62,7 @@ r = -((2*(M'*M)*v) - (2*M'*b) + (2*lambda*(C'*C)*v));
 delta = r;
 dNew = r'*r;
 initDelta = dNew;
-epsilon = 0.5;
+epsilon = 0.1;
 maxI = 100;
 while (i < maxI && dNew > (epsilon^2)*initDelta)
     disp(i);
@@ -88,4 +89,4 @@ while (i < maxI && dNew > (epsilon^2)*initDelta)
     i = i + 1;
 end
 localLight = averageLight(v);
-plotLightDirection(img, L, out.center, lenPlot);
+plotLightDirection(img, localLight, out.center, lenPlot);
