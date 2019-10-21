@@ -5,23 +5,20 @@ listData = loadData('../../dataset/authentic/2/**/*.JPG');
 
 % Load image data and convert into grayscale
 lenPlot = 1;
-img = imread('../data/1_L3.jpg');
+% img = imread('../data/1_L3.jpg');
+img = imread(listData{3});
 img = imresize(img, 0.25);
 
 disp('Image segmentation..');
+% [obj, gray, mask, out] = imsegment(img, 'segType', 'meanshift', ...
+%     'SpatialBandWidth', 2, 'RangeBandWidth', 2.4);
+
 [obj, gray, mask, out] = imsegment(img, 'segType', 'meanshift', ...
-    'SpatialBandWidth', 2, 'RangeBandWidth', 2.4);
+    'SpatialBandWidth', 3, 'RangeBandWidth', 6.5);
 
-%% Calculate light source direction for every object
-% Infinite light source model
-% disp('Estimate light source direction...');
-% for i = 1:size(obj,2)
-%     L(i,:) = lightDirection(obj{i}, gray{i});
-% end
-% plot light source direction
-% plotLightDirection(img, L, out.center, lenPlot);
+imshow(mask);
 
-%% TODO: Do local light source detection
+%% Do local light source detection
 % first thing to do, calculate the initial lighting direction by solving
 % the equation (7) from the paper.
 numGaps = 10;
@@ -37,8 +34,6 @@ M = blkdiag(N{:});
 M = [M ones(size(M,1),1)];
 b = intBoundary';
 v = inv(M'*M)*M'*b;
-% define the regularization term using equation (23) and obtain the value
-% from the initial average of lighting direction.
 L = averageLight(v);
 
 %% get center for every surface plane
@@ -64,6 +59,7 @@ dNew = r'*r;
 initDelta = dNew;
 epsilon = 0.1;
 maxI = 100;
+% using conjugate gradient to solving final error equation
 while (i < maxI && dNew > (epsilon^2)*initDelta)
     disp(i);
     upDelta = delta'*delta;
