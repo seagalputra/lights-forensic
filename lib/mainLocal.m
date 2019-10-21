@@ -6,7 +6,7 @@ listData = loadData('../../dataset/authentic/2/**/*.JPG');
 % Load image data and convert into grayscale
 lenPlot = 1;
 % img = imread('../data/1_L3.jpg');
-img = imread(listData{3});
+img = imread(listData{5});
 img = imresize(img, 0.25);
 
 disp('Image segmentation..');
@@ -14,18 +14,21 @@ disp('Image segmentation..');
 %     'SpatialBandWidth', 2, 'RangeBandWidth', 2.4);
 
 [obj, gray, mask, out] = imsegment(img, 'segType', 'meanshift', ...
-    'SpatialBandWidth', 3, 'RangeBandWidth', 6.5);
+    'SpatialBandWidth', 3, 'RangeBandWidth', 7.5);
 
-imshow(mask);
+% imshow(mask, 'InitialMagnification', 67);
 
 %% Do local light source detection
 % first thing to do, calculate the initial lighting direction by solving
 % the equation (7) from the paper.
+
+for numObj = 1:size(obj,2)
+disp(['Assesing object ', num2str(numObj)]);
 numGaps = 10;
 offset = 15;
 nPoints = 4;
-[normals, vertices] = getSurfaceNormal(obj{1}, numGaps);
-intBoundary = getIntensity(gray{1}, normals, vertices, offset);
+[normals, vertices] = getSurfaceNormal(obj{numObj}, numGaps);
+intBoundary = getIntensity(gray{numObj}, normals, vertices, offset);
 
 % split vertices into several plane
 vertPlane = getSurfacePlane(vertices, nPoints);
@@ -36,19 +39,19 @@ b = intBoundary';
 v = inv(M'*M)*M'*b;
 L = averageLight(v);
 
-%% get center for every surface plane
+% get center for every surface plane
 cen = cellfun(@median, vertPlane, 'UniformOutput', false);
 
-for i = 1:size(cen,1)
-    delt = (L - cen{i})/norm(L - cen{i});
+for numCenter = 1:size(cen,1)
+    delt = (L - cen{numCenter})/norm(L - cen{numCenter});
     residual = delt'*delt;
     ident = eye(size(residual,1), 'like', residual);
-    c{i} = ident - residual;
+    c{numCenter} = ident - residual;
 end
 C = blkdiag(c{:});
 C = [C, zeros(size(C,1),1)];
 
-%% Conjugate Gradient
+% Conjugate Gradient
 lambda = 1;
 i = 0;
 k = 0;
@@ -61,7 +64,7 @@ epsilon = 0.1;
 maxI = 100;
 % using conjugate gradient to solving final error equation
 while (i < maxI && dNew > (epsilon^2)*initDelta)
-    disp(i);
+    disp(['Iteration - ', num2str(i)]);
     upDelta = delta'*delta;
     alpha = -(((2*M'*M*v) - (2*M'*b) + (2*lambda*C'*C*v))'*delta) / (delta'*((2*M'*M) + (2*lambda*C'*C))*delta);
     v = v + (alpha*delta);
@@ -84,5 +87,7 @@ while (i < maxI && dNew > (epsilon^2)*initDelta)
     end
     i = i + 1;
 end
-localLight = averageLight(v);
-plotLightDirection(img, localLight, out.center, lenPlot);
+% obtain final lighting direction
+localLight(numObj,:) = averageLight(v);
+end
+plotLightDirection(img, localLight, out.center);
