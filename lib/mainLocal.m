@@ -3,16 +3,15 @@ clear; clc; close all;
 % Load batch image data
 listData = loadData('../../dataset/authentic/2/**/*.JPG');
 
-% Load image data and convert into grayscale
+% PARAMETER
 lenPlot = 1;
-% img = imread('../data/1_L3.jpg');
-img = imread(listData{5});
+threshold = 30;
+
+% Load image data and convert into grayscale
+img = imread(listData{7});
 img = imresize(img, 0.25);
 
 disp('Image segmentation..');
-% [obj, gray, mask, out] = imsegment(img, 'segType', 'meanshift', ...
-%     'SpatialBandWidth', 2, 'RangeBandWidth', 2.4);
-
 [obj, gray, mask, out] = imsegment(img, 'segType', 'meanshift', ...
     'SpatialBandWidth', 3, 'RangeBandWidth', 7.5);
 
@@ -89,5 +88,20 @@ while (i < maxI && dNew > (epsilon^2)*initDelta)
 end
 % obtain final lighting direction
 localLight(numObj,:) = averageLight(v);
+degree(numObj,:) = atan2(-localLight(numObj,2), localLight(numObj,1))*180/pi;
+
 end
 plotLightDirection(img, localLight, out.center);
+
+%% Check the angle between two object.
+% If below threshold, then the image is authentic. If not, then the image
+% is not authentic.
+possibleDegree = nchoosek(degree,2);
+diffLight = abs(possibleDegree(:,2) - possibleDegree(:,1));
+nonAuth = find(diffLight > threshold);
+disp(diffLight);
+if (isempty(nonAuth) == 0)
+    disp('This image is forgery');
+else
+    disp('This image is authentic');
+end
