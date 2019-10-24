@@ -26,6 +26,7 @@ twoObjFor.Labels = labelFor;
 % combine every dataset
 twoObj = imageDatastore(cat(1, twoObjAuth.Files, twoObjFor.Files));
 twoObj.Labels = cat(1, twoObjAuth.Labels, twoObjFor.Labels);
+twoObj = shuffle(twoObj);
 
 %% load data for 3 object
 % load and assign label for authentic data
@@ -51,5 +52,6 @@ threeObjFor.Labels = labelFor;
 % combine every dataset
 threeObj = imageDatastore(cat(1, threeObjAuth.Files, threeObjFor.Files));
 threeObj.Labels = cat(1, threeObjAuth.Labels, threeObjFor.Labels);
+threeObj = shuffle(threeObj);
 
 save('../data/dataset.mat', 'twoObj', 'threeObj');

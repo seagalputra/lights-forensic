@@ -15,5 +15,5 @@ disp('Estimate light source direction...');
 for i = 1:size(obj,2)
     L(i,:) = lightDirection(obj{i}, gray{i});
 end
-plot light source direction
-plotLightDirection(img, L, out.center, lenPlot);
+% plot light source direction
+plotLightDirection(img, L, out.center);
