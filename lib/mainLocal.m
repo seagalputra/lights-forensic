@@ -5,7 +5,7 @@ listData = loadData('../../dataset/authentic/2/**/*.JPG');
 
 % PARAMETER
 lenPlot = 1;
-threshold = 30;
+threshold = 40;
 
 % Load image data and convert into grayscale
 img = imread(listData{7});
