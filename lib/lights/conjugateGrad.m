@@ -11,7 +11,7 @@ epsilon = 0.1;
 maxI = 100;
 % using conjugate gradient to solving final error equation
 while (i < maxI && dNew > (epsilon^2)*initDelta)
-    disp(['Iteration - ', num2str(i)]);
+    % disp(['Iteration - ', num2str(i)]);
     upDelta = delta'*delta;
     alpha = -(((2*M'*M*v) - (2*M'*b) + (2*lambda*C'*C*v))'*delta) / (delta'*((2*M'*M) + (2*lambda*C'*C))*delta);
     v = v + (alpha*delta);

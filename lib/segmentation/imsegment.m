@@ -6,6 +6,7 @@ function [objMask, objGray, mask, out] = imsegment(image, varargin)
     defaultSegType = 'meanshift';
     defaultSpatialBandWidth = 3;
     defaultRangeBandWidth = 4.0;
+    defaultGamma = 0.25;
     % validate function input parameter
     parser = inputParser;
     addRequired(parser, 'image', @isRGB);
@@ -16,6 +17,9 @@ function [objMask, objGray, mask, out] = imsegment(image, varargin)
     % parameter for meanshift
     addParameter(parser, 'SpatialBandWidth', defaultSpatialBandWidth, @isnumeric);
     addParameter(parser, 'RangeBandWidth', defaultRangeBandWidth, @isnumeric);
+    
+    % parameter for preprocessing
+    addParameter(parser, 'gamma', defaultGamma, @isnumeric);
     
     % other parameter
     addParameter(parser, 'sizeThreshold', defaultThreshold, @isnumeric);
@@ -30,6 +34,7 @@ end
 function [objMask, objGray, mask, out] = segmentImage(params)
     % convert image into grayscale
     gray = convertToGray(params.image);
+    
     % decide which segmentation is used
     switch params.segType
         case 'kmeans'
@@ -38,7 +43,9 @@ function [objMask, objGray, mask, out] = segmentImage(params)
         case 'thresh'
             mask = colorThreshold(params.image);
         case 'meanshift'
-            mask = meanShiftSegmentation(params.image, params.SpatialBandWidth, ...
+            % preprocessing state
+            preImg = imadjust(params.image, [], [], params.gamma);
+            mask = meanShiftSegmentation(preImg, params.SpatialBandWidth, ...
                 params.RangeBandWidth, params.sizeThreshold);
     end
     

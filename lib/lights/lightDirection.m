@@ -1,4 +1,4 @@
-function [L, theta] = lightDirection(object, grayImage, varargin)
+function [L, theta, normals, vertices] = lightDirection(object, grayImage, varargin)
     % DEFAULT PARAMETER
     defaultNPoints = 4;
     defaultLambda = 1;
@@ -19,16 +19,16 @@ function [L, theta] = lightDirection(object, grayImage, varargin)
     inputs = parser.Results;
     
     % call the main logic
-    [L, theta] = getLightDirection(inputs);
+    [L, theta, normals, vertices] = getLightDirection(inputs);
 end
 
-function [L, theta] = getLightDirection(params)    
+function [L, theta, normals, vertices] = getLightDirection(params)    
     switch params.modelType
         case 'infinite'
             L = infiniteLight(params.object, params.grayImage, ...
                 params.nPoints, params.lambda, params.numGaps, params.offset);
         case 'local'
-            [L, theta] = localLight(params.object, params.grayImage, ...
+            [L, theta, normals, vertices] = localLight(params.object, params.grayImage, ...
                 params.nPoints, params.lambda, params.numGaps, params.offset);
     end
 end
@@ -47,9 +47,11 @@ function L = infiniteLight(object, grayImage, nPoints, lambda, numGaps, offset)
     L = averageLight(v);
 end
 
-function [L, theta] = localLight(object, grayImage, nPoints, lambda, numGaps, offset)
+function [L, theta, normals, vertices] = localLight(object, grayImage, nPoints, lambda, numGaps, offset)
     % find points at boundary object and calculate surface normal
     [normals, vertices] = getSurfaceNormal(object, numGaps);
+    % make sure the value doesn't include NaN
+    normals(isnan(normals)) = -1;
     % obtain intensity at boundary image using improfile and extrapolation
     intBoundary = getIntensity(grayImage, normals, vertices, offset);
     % split vertices and normals into several plane

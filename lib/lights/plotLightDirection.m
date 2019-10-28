@@ -1,4 +1,4 @@
-function plotLightDirection(image, lightDirection, center)
+function plotLightDirection(image, lightDirection, center, filename)
 imshow(image, 'InitialMagnification', 67);
 hold on;
 for i = 1:size(lightDirection,1)
@@ -8,3 +8,4 @@ for i = 1:size(lightDirection,1)
    legendInfo{i} = num2str(lightDirection(i,:));
 end
 legend(legendInfo);
+title(filename, 'Interpreter', 'none');

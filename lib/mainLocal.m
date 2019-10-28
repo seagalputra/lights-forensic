@@ -3,41 +3,81 @@ clear; clc; close all;
 load('../data/dataset.mat');
 
 %% Load image data
-[img, imgInfo] = readimage(twoObj, 1);
+for i = 1:size(twoObj.Files,1)
+disp(['Calculating object-', num2str(i)]);
+[img, imgInfo] = readimage(twoObj, i);
 img = imresize(img, 0.25);
 
-% img = imadjust(img, [], [], 0.32);
+% save actual label
+label(i,:) = imgInfo.Label;
+% save filename
+name = split(imgInfo.Filename, '\');
+name = name{end};
+% remove filename extensions
+filename = split(name, '.');
+filename = filename{1};
+listFilename{i,:} = filename;
 
-disp('Image segmentation..');
+%% image segmentation using meanshift
 [obj, gray, mask, out] = imsegment(img, 'segType', 'meanshift', ...
-    'SpatialBandWidth', 3, 'RangeBandWidth', 6.5);
-
-% subplot(121), imshow(img), title('Original Image');
-% subplot(122), imshow(mask), title('Mask Image');
+    'SpatialBandWidth', 3, 'RangeBandWidth', 6.5, 'gamma', 0.32);
 
 %% Do local light source detection
-% first thing to do, calculate the initial lighting direction by solving
-% the equation (7) from the paper.
-
 % PARAMETER
 lenPlot = 1;
-threshold = 40;
-
+threshold = 30;
+listLight = [];
 for numObj = 1:size(obj,2)
-    disp(['Assesing object ', num2str(numObj)]);
-    [localLight(numObj,:), degree(numObj,:)] = lightDirection(obj{numObj}, gray{numObj}, 'modelType', 'local');
+    % disp(['Assesing object ', num2str(numObj)]);
+    [light, degree(numObj,:), normals, vertices] = lightDirection(obj{numObj}, ...
+        gray{numObj}, 'modelType', 'local');
+    
+    localLight(numObj,:) = light;
+    listLight = [listLight, light];
+    
+    % listNormals{numObj,:} = normals';
+    
+    % plot every surface normal
+    figure(1);
+    subplot(1,size(obj,2),numObj);
+    imshow(gray{numObj});
+    hold on;
+    plot([vertices(:,1) vertices(:,1)+10*normals(:,1)]', [vertices(:,2) vertices(:,2)+10*normals(:,2)]');
+    % saving current figure
+    saveas(gca, fullfile('../data/figure/normals/2', strcat(num2str(i), '.jpg')));
 end
-plotLightDirection(img, localLight, out.center);
 
+featureLight{i,:} = listLight;
 %% Check the angle between two object.
 % If below threshold, then the image is authentic. If not, then the image
 % is not authentic.
 possibleDegree = nchoosek(degree,2);
 diffLight = abs(possibleDegree(:,2) - possibleDegree(:,1));
 nonAuth = find(diffLight > threshold);
-disp(diffLight);
 if (isempty(nonAuth) == 0)
-    disp('This image is forgery');
+    % forgery label
+    predict(i,:) = 0;
 else
-    disp('This image is authentic');
+    % authentic label
+    predict(i,:) = 1;
 end
+
+%% Plot and save current figure
+% plot light direction
+figure(2);
+plotLightDirection(img, localLight, out.center, filename);
+saveas(gca, fullfile('../data/figure/light/2', strcat(num2str(i), '.jpg')));
+
+% clearing variable
+% clear localLight degree; 
+close all;
+end
+%% Calculating the accuracy
+rightLabel = label == predict;
+accuracy = sum(rightLabel) / size(label,1);
+disp(['Akurasi : ', num2str(accuracy)]);
+
+%% Creating table to store information
+tblInfo = table(listFilename, label, predict);
+% Save table to excel format
+writetable(tblInfo, strcat('../data/lightInfo2Object-',num2str(threshold),'.xlsx'));
