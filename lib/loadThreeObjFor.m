@@ -1,7 +1,7 @@
 clear; clc; close all;
 
-% load two object forgery
-twoObject = dir('../../testing/dataset/2-object/forgery/**/*.jpg');
+% load three object forgery
+threeObj = dir('../../testing/dataset/3-object/forgery/**/*.jpg');
 
 %% Iterate for every forgery folder
 % for multiple-multiple
@@ -12,12 +12,12 @@ L9L15 = {}; L10L10 = {}; L15L6 = {}; L15L10 = {};
 L1L10 = {}; L2L5 = {}; L3L5 = {}; L5L3 = {};
 L6L3 = {}; L9L3 = {}; L10L2 = {}; L10L3 = {};
 
-for i = 1:size(twoObject,1)
+for i = 1:size(threeObj,1)
     % generate filename and folder for every file
-    folder = twoObject(i).folder;
+    folder = threeObj(i).folder;
     id = strsplit(folder, '\');
     id = id{end};
-    fullpath = fullfile(folder, twoObject(i).name);
+    fullpath = fullfile(folder, threeObj(i).name);
     % separate every file into id
     switch id
         case 'L5L5'
@@ -54,8 +54,8 @@ for i = 1:size(twoObject,1)
             L10L3{end+1} = fullpath;
     end
 end
-%% append all data into one struct object
-twoObjFor = struct( ...
+%% Combine cell into struct
+threeObjFor = struct( ...
     'L5L5',L5L5', ...
     'L5L15',L5L15', ...
     'L6L5',L6L5', ...
@@ -74,4 +74,4 @@ twoObjFor = struct( ...
     'L10L3',L10L3' ...
     );
 
-save('../../testing/twoObjForgery.mat', 'twoObjFor');
+save('../../testing/threeObjForgery.mat', 'threeObjFor');
