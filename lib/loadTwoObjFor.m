@@ -1,0 +1,48 @@
+clear; clc; close all;
+
+% load two object forgery
+twoObject = dir('../../testing/dataset/2-object/forgery/**/*.jpg');
+
+%% Iterate for every forgery folder
+% for multiple-multiple
+L5L5 = {}; L5L15 = {}; L6L5 = {}; L9L10 = {};
+L9L15 = {}; L10L10 = {}; L15L6 = {}; L15L10 = {};
+for i = 1:size(twoObject,1)
+    % generate filename and folder for every file
+    folder = twoObject(i).folder;
+    id = strsplit(folder, '\');
+    id = id{end};
+    fullpath = fullfile(folder, twoObject(i).name);
+    % separate every file into id
+    switch id
+        case 'L5L5'
+            L5L5{end+1} = fullpath;
+        case 'L5L15'
+            L5L15{end+1} = fullpath;
+        case 'L6L5'
+            L6L5{end+1} = fullpath;
+        case 'L9L10'
+            L9L10{end+1} = fullpath;
+        case 'L9L15'
+            L9L15{end+1} = fullpath;
+        case 'L10L10'
+            L10L10{end+1} = fullpath;
+        case 'L15L6'
+            L15L6{end+1} = fullpath;
+        case 'L15L10'
+            L15L10{end+1} = fullpath;
+    end
+end
+%% append all data into one struct object
+twoObjFor = struct( ...
+    'L5L5',L5L5', ...
+    'L5L15',L5L15', ...
+    'L6L5',L6L5', ...
+    'L9L10',L9L10', ...
+    'L9L15',L9L15', ...
+    'L10L10',L10L10', ...
+    'L15L6',L15L6', ...
+    'L15L10',L15L10' ...
+    );
+
+save('../../testing/twoObjForgery.mat', 'twoObjFor');

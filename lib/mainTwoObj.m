@@ -18,7 +18,7 @@ filename = split(name, '.');
 filename = filename{1};
 listFilename{i,:} = filename;
 
-%% image segmentation using meanshift
+%% image segmentation
 [obj, gray, mask, out] = imsegment(img, 'segType', 'meanshift', ...
     'SpatialBandWidth', 3, 'RangeBandWidth', 6.5, 'gamma', 0.32);
 
@@ -34,8 +34,6 @@ for numObj = 1:size(obj,2)
     
     localLight(numObj,:) = light;
     listLight = [listLight, light];
-    
-    % listNormals{numObj,:} = normals';
     
     % plot every surface normal
     figure(1);
@@ -69,7 +67,7 @@ plotLightDirection(img, localLight, out.center, filename);
 saveas(gca, fullfile('../data/figure/light/2', strcat(num2str(i), '.jpg')));
 
 % clearing variable
-% clear localLight degree; 
+clear localLight degree; 
 close all;
 end
 %% Calculating the accuracy
