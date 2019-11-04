@@ -36,4 +36,5 @@ while (i < maxI && dNew > (epsilon^2)*initDelta)
 end
 % obtain final lighting direction
 L = averageLight(v);
-theta = atan2(-L(2), L(1))*180/pi;
+% theta = atan2(-L(2), L(1))*180/pi;
+theta = lightAngle(L(1), L(2));

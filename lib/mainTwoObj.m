@@ -26,7 +26,7 @@ listFilename{i,:} = filename;
 % PARAMETER
 lenPlot = 1;
 threshold = 30;
-listLight = [];
+% listLight = [];
 for numObj = 1:size(obj,2)
     % disp(['Assesing object ', num2str(numObj)]);
     [light, degree(numObj,:), normals, vertices] = lightDirection(obj{numObj}, ...
@@ -45,7 +45,7 @@ for numObj = 1:size(obj,2)
     saveas(gca, fullfile('../data/figure/normals/2', strcat(num2str(i), '.jpg')));
 end
 
-featureLight{i,:} = listLight;
+% featureLight{i,:} = listLight;
 %% Check the angle between two object.
 % If below threshold, then the image is authentic. If not, then the image
 % is not authentic.

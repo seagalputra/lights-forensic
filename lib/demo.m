@@ -17,13 +17,9 @@ disp('Segmentasi gambar...');
 disp('Estimasi arah sumber cahaya...');
 lenPlot = 1;
 threshold = 30;
-listLight = [];
 for numObj = 1:size(obj,2)
-    [light, degree(numObj,:), normals, vertices] = lightDirection(obj{numObj}, ...
+    [localLight(numObj,:), degree(numObj,:), normals, vertices] = lightDirection(obj{numObj}, ...
         gray{numObj}, 'modelType', 'local');
-    
-    localLight(numObj,:) = light;
-    listLight = [listLight, light];
     
     % plot every surface normal
     figure(1);
