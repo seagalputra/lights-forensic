@@ -30,6 +30,9 @@ function [L, theta, normals, vertices] = getLightDirection(params)
         case 'local'
             [L, theta, normals, vertices] = localLight(params.object, params.grayImage, ...
                 params.nPoints, params.lambda, params.numGaps, params.offset);
+        case 'complex'
+            [L, theta, normals, vertices] = lightComplex(params.object, params.grayImage, ...
+                params.lambda, params.numGaps, params.offset);
     end
 end
 
@@ -63,6 +66,19 @@ function [L, theta, normals, vertices] = localLight(object, grayImage, nPoints, 
     C = regularization(initL, vertPlane);
     % Do conjugate gradient
     [L, theta] = conjugateGrad(v, M, b, C, lambda);
+end
+
+function [v, theta, normals, vertices] = lightComplex(object, grayImage, lambda, numGaps, offset)
+    [normals, vertices] = getSurfaceNormal(object, numGaps);
+    normals(isnan(normals)) = -1;
+    intBoundary = getIntensity(grayImage, normals, vertices, offset);
+    % get block N matrix using spherical harmonics coefficient
+    M = spHarMatrices(normals);
+    % estimate lighting complex environment
+    C = diag([1, 2, 2, 3, 3]);
+    v = solveEstComplex(M, C, intBoundary, lambda);
+    % get principal light direction
+    theta = getPrincipalLight(normals, intBoundary, lambda);
 end
 
 function checkGray = isGrayscale(gray)

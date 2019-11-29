@@ -1,4 +1,7 @@
 function vertices = boundaryImage(binaryMask, numGaps)
+
+% make sure no little noise mask in image
+binaryMask = bwareaopen(binaryMask, 500);
 % trace a boundary
 bwIdx = find(binaryMask);
 % set first index for initial point to trace

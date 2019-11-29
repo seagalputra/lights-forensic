@@ -7,6 +7,7 @@ function [objMask, objGray, mask, out] = imsegment(image, varargin)
     defaultSpatialBandWidth = 3;
     defaultRangeBandWidth = 4.0;
     defaultGamma = 0.25;
+    defaultNumberToExtract = 2;
     % validate function input parameter
     parser = inputParser;
     addRequired(parser, 'image', @isRGB);
@@ -24,6 +25,7 @@ function [objMask, objGray, mask, out] = imsegment(image, varargin)
     % other parameter
     addParameter(parser, 'sizeThreshold', defaultThreshold, @isnumeric);
     addParameter(parser, 'segType', defaultSegType, @ischar);
+    addParameter(parser, 'numberToExtract', defaultNumberToExtract, @isnumeric);
     
     parse(parser, image, varargin{:});
     inputs = parser.Results;
@@ -49,6 +51,8 @@ function [objMask, objGray, mask, out] = segmentImage(params)
                 params.RangeBandWidth, params.sizeThreshold);
     end
     
+    % select the largest blobs
+    % mask = ExtractNLargestBlobs(mask, params.numberToExtract);
     % create bounding box and obtain properties of the image
     [center, radius, boxProps] = getBinaryProps(mask);
     % crop every object
