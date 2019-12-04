@@ -10,10 +10,13 @@ for i = 1:size(imds.Files,1)
     filePath = strsplit(filePath, '\');
     if (strcmp(filePath{7}, 'authentic'))
         labels(i,:) = 1;
-    elseif (strcmp(filePath{7}, 'forgery'))
+    elseif (strcmp(filePath{7}, 'fake'))
         labels(i,:) = 0;
     end
 end
 % save label into imageDatastore
 imds.Labels = labels;
-save('../../dataset.mat', 'imds');
+
+% get an user input to store data in mat-files
+filename = input('Please input filename : ', 's');
+save(fullfile(strcat(filename, '.mat')), 'imds');
