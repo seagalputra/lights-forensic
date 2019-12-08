@@ -15,10 +15,12 @@ for j = 1:size(obj,2)
     lights{j,:} = light;
 end
 
-%% plot light using sphere
+%% Plot light using sphere
 lightCoeff = lights{1,:};
 lightCoeff(6:9,:) = 0;
 
 imshow(gray{1});
 % plotLitSphere(lightCoeff);
 shading = plotLitSphere2(lightCoeff, 4, 1);
+
+%% Plot light direction

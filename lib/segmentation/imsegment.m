@@ -52,7 +52,7 @@ function [objMask, objGray, mask, out] = segmentImage(params)
     end
     
     % select the largest blobs
-    % mask = ExtractNLargestBlobs(mask, params.numberToExtract);
+    mask = ExtractNLargestBlobs(mask, params.numberToExtract);
     % create bounding box and obtain properties of the image
     [center, radius, boxProps] = getBinaryProps(mask);
     % crop every object

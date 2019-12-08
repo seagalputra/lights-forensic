@@ -1,24 +1,32 @@
 clear; clc; close all;
 
-% load('datasetAlt.mat');
-load('2ObjectNoPostProcess.mat');
+load('2LightsNoPostprocess.mat');
 
+predicts = [];
+probability = [];
 for i = 1:size(imds.Files,1)
-    disp(['Estimating image - ', num2str(i)]);
+    disp(num2str(i));
     % load image
     img = imread(imds.Files{i});
     img = imresize(img, 0.5);
 
     % segement image using meanshift
-    [obj, gray, mask, params] = imsegment(img, 'segType', 'meanshift', ...
-        'SpatialBandWidth', 3, 'RangeBandWidth', 6.5, ...
-        'gamma', 0.32);
+    [obj, gray, mask, params] = imsegment(img, ...
+        'segType', 'meanshift', ...
+        'SpatialBandWidth', 3, ...
+        'RangeBandWidth', 6.5, ...
+        'gamma', 0.32, ...
+        'numberToExtract', 2, ...
+        'sizeThreshold', 500);
     
     % calculate complex lighting environment
+    lights = {};
+    listDegree = [];
     for j = 1:size(obj,2)
-        [light, degree(j,:), normals, vertices] = lightDirection(obj{j}, gray{j}, ...
+        [light, degree, normals, vertices] = lightDirection(obj{j}, gray{j}, ...
             'modelType', 'complex');
-        lights{j,:} = light;
+        lights{end+1} = light;
+        listDegree = [listDegree; degree];
     end
     
     % compute correlation between several lighting condition
@@ -28,28 +36,21 @@ for i = 1:size(imds.Files,1)
     end
     
     % compute different between principal light direction
-    possibleDegree = nchoosek(degree,2);
+    % possibleDegree = nchoosek(degree,2);
+    possibleDegree = nchoosek(listDegree,2);
     diffLight = abs(possibleDegree(:,2) - possibleDegree(:,1));
     
-    for numFeatures = 1:size(diffLight,1)
-        % membership function 1
-        degreeCorrelation(1) = sigmoidLeft(corrLight(numFeatures,:), 0.35, 0.5, 0.65); % low
-        degreeCorrelation(2) = sigmoidRight(corrLight(numFeatures,:), 0.4, 0.65, 0.8); % high
+    % membership function 1
+    degreeCorrelation(1) = sigmoidLeft(corrLight, 0.35, 0.5, 0.65); % low
+    degreeCorrelation(2) = sigmoidRight(corrLight, 0.4, 0.65, 0.8); % high
         
-        % membership function 2
-        degreeTheta(1) = sigmoidLeft(diffLight(numFeatures,:), 45, 57, 92); % low
-        degreeTheta(2) = sigmoidRight(diffLight(numFeatures,:), 81, 105, 135); % high
-        
-        % predict using rule
-        tempPredicts(numFeatures,:) = rule(degreeCorrelation, degreeTheta);
-    end
+    % membership function 2
+    degreeTheta(1) = sigmoidLeft(diffLight, 45, 57, 92); % low
+    degreeTheta(2) = sigmoidRight(diffLight, 81, 105, 135); % high
     
-    nonAuth = find(tempPredicts == 0);
-    if (isempty(nonAuth))
-        predicts(i,:) = 1;
-    else
-        predicts(i,:) = 0;
-    end
+    [predicted, degreeForgery, degreeAuthentic] = rule(degreeCorrelation, degreeTheta);
+    predicts = [predicts; predicted];
+    probability = [probability; degreeForgery, degreeAuthentic];
 end
 
 %% create performance model analysis using ROC curve
@@ -61,24 +62,24 @@ TN = confMatrix(2,2);
 % Accuracy
 disp(['Accuracy                     : ', num2str(100*(TP+TN)/(TP+TN+FP+FN)), ' %']);
 % True Positive Rate
-disp(['True Positive Rate           : ', num2str(100*TP/(TP+FN))], ' %');
+disp(['True Positive Rate           : ', num2str(100*TP/(TP+FN)), ' %']);
 % True Negative Rate
-disp(['True Negative Rate           : ', num2str(100*TN/(TN+FP))], ' %');
+disp(['True Negative Rate           : ', num2str(100*TN/(TN+FP)), ' %']);
 % False Positive Rate
-disp(['False Positive Rate          : ', num2str(100*FP/(FP+TN))], ' %');
+disp(['False Positive Rate          : ', num2str(100*FP/(FP+TN)), ' %']);
 % False Negative Rate
 disp(['False Negative Rate          : ', num2str(100*FN/(FN+TP)), ' %']);
 % Positive Predictive Value
 disp(['Positive Predictive Value    : ', num2str(100*TP/(TP+FP)), ' %']);
 % Negative Predictive Value
-disp(['Negative Predictive Value    : ', num2str(100*TN/(TN+FN))], ' %');
+disp(['Negative Predictive Value    : ', num2str(100*TN/(TN+FN)), ' %']);
 % False Discovery Rate
-disp(['False Discovery Rate         : ', num2str(100*FP/(FP+TP))], ' %');
+disp(['False Discovery Rate         : ', num2str(100*FP/(FP+TP)), ' %']);
 % False Omission Rate
-disp(['False Omission Rate          : ', num2str(100*FN/(FN+TN))], ' %');
+disp(['False Omission Rate          : ', num2str(100*FN/(FN+TN)), ' %']);
 
 c = linspace(0,1);
-[FPR, TPR, T, AUC] = perfcurve(imds.Labels, predicts, 1);
+[FPR, TPR, T, AUC] = perfcurve(imds.Labels, probability(:,2), 1);
 plot(c,c,'--');
 hold on;
 plot(FPR, TPR, 'LineWidth', 2);
