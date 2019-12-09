@@ -1,8 +1,5 @@
 clear; clc; close all;
 
-% listData = dir('observationData/*.mat');
-% listData = dir('pengujian/sumber_cahaya/*.mat');
-% listData = dir('pengujian/rotasi/*.mat');
 listData = dir('pengujian/scaling/*.mat');
 for numData = 1:size(listData,1)
     disp(['Assesing file : ', listData(numData).name]);
@@ -60,40 +57,4 @@ for numData = 1:size(listData,1)
         predicts = [predicts; predicted];
         probability = [probability; degreeForgery, degreeAuthentic];
     end
-    
-    % create performance model analysis using ROC curve
-    [FPR, TPR, T, AUC] = perfcurve(labels, probability(:,2), 1);
-    
-    threshold = 0.7;
-    pred = (probability(:,2)>=threshold);
-    TP = sum(pred == 1 & labels == 1);
-    FP = sum(pred == 1 & labels == 0);
-    TN = sum(pred == 0 & labels == 0);
-    FN = sum(pred == 0 & labels == 1);
-    
-    disp(['Area Under the Curve         : ', num2str(AUC)]);
-    disp(['Accuracy                     : ', num2str(100*(TP+TN)/(TP+TN+FP+FN)), ' %']);
-    disp(['True Positive Rate           : ', num2str(100*TP/(TP+FN)), ' %']);
-    disp(['False Positive Rate          : ', num2str(100*FP/(FP+TN)), ' %']);
-    % disp(['True Negative Rate           : ', num2str(100*TN/(TN+FP)), ' %']);
-    % disp(['False Negative Rate          : ', num2str(100*FN/(FN+TP)), ' %']);
-    % disp(['Positive Predictive Value    : ', num2str(100*TP/(TP+FP)), ' %']);
-    % disp(['Negative Predictive Value    : ', num2str(100*TN/(TN+FN)), ' %']);    
-    % disp(['False Discovery Rate         : ', num2str(100*FP/(FP+TP)), ' %']);
-    % disp(['False Omission Rate          : ', num2str(100*FN/(FN+TN)), ' %']);
-    disp('----------------------------------------------------------');
-    
-    c = linspace(0,1);
-    plot(c,c,'--');
-    hold on;
-    plot(FPR, TPR, 'LineWidth', 2);
-    title('ROC Curve - Distorsi Scaling');
-    legend('2 Sumber Cahaya', '3 Sumber Cahaya', '4 Sumber Cahaya');
-    
-%     if (mod(numData,3) == 0)
-%         saveas(gca, fullfile('../../pengujian', strcat(listData(numData).name, '.jpg')));
-%         
-%         % close figure
-%         close all;
-%     end
 end
