@@ -22,7 +22,7 @@ function varargout = Forensic(varargin)
 
 % Edit the above text to modify the response to help Forensic
 
-% Last Modified by GUIDE v2.5 10-Dec-2019 09:51:55
+% Last Modified by GUIDE v2.5 10-Dec-2019 11:47:42
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -81,7 +81,19 @@ function popup_label_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns popup_label contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from popup_label
+global label;
+contents = cellstr(get(hObject, 'String'));
+choice = contents{get(hObject, 'Value')};
+if (strcmp(choice, 'Tidak terindikasi manipulasi'))
+    label = 1;
+elseif (strcmp(choice, 'Terindikasi manipulasi'))
+    label = 0;
+else
+    label = NaN;
+end
 
+% set label into static text
+set(handles.text_actual, 'String', choice);
 
 % --- Executes during object creation, after setting all properties.
 function popup_label_CreateFcn(hObject, eventdata, handles)
@@ -101,7 +113,42 @@ function btn_deteksi_Callback(hObject, eventdata, handles)
 % hObject    handle to btn_deteksi (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+global image;
+global label;
+% resize image into half
+imgResize = imresize(image, 0.5);
+% segment image using meanshift
+[obj, gray, mask, params] = imsegment(imgResize, ...
+    'segType', 'meanshift', ...
+    'SpatialBandWidth', 3, ...
+    'RangeBandWidth', 6.5, ...
+    'gamma', 0.32, ...
+    'numberToExtract', 2, ...
+    'sizeThreshold', 500);
+% calculate complex lighting environment
+lights = {};
+listDegree = [];
+for i = 1:size(obj,2)
+    [light, degree, normals, vertices] = lightDirection(obj{i}, ...
+        'modelType', 'complex');
+    lights{end+1} = light;
+    listDegree = [listDegree; degree];
+end
+% compute correlation between several lighting condition
+possibleLights = nchoosek(lights,2);
+for numLight = 1:size(possibleLights,1)
+    corrLight(numLight,:) = getCorrelation(possibleLights{numLight,1}, possibleLights{numLight,2});
+end
+% compute different between principal light direction
+possibleDegree = nchoosek(listDegree,2);
+diffLight = abs(possibleDegree(:,2) - possibleDegree(:,1));
 
+% by using membership function, classify image into appropriate label
+degreeCorrelation(1) = sigmoidLeft(corrLight, 0.15, 0.23, 0.3);
+degreeCorrelation(2) = sigmoidRight(corrLight, 0.24, 0.4, 0.8);
+degreeTheta(1) = sigmoidLeft(diffLight, 45, 57, 92);
+degreeTheta(2) = sigmoidRight(diffLight, 81, 105, 135);
+[predicted, degreeForgey, degreeAuthentic] = rule(degreeCorrelation, degreeTheta);
 
 % --- Executes on button press in btn_detail.
 function btn_detail_Callback(hObject, eventdata, handles)
@@ -128,3 +175,4 @@ function btn_reset_Callback(hObject, eventdata, handles)
 % hObject    handle to btn_reset (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+cla(handles.fig_image);
