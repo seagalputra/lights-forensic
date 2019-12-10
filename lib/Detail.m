@@ -22,7 +22,7 @@ function varargout = Detail(varargin)
 
 % Edit the above text to modify the response to help Detail
 
-% Last Modified by GUIDE v2.5 10-Dec-2019 10:14:41
+% Last Modified by GUIDE v2.5 10-Dec-2019 18:31:13
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -59,7 +59,16 @@ handles.output = hObject;
 guidata(hObject, handles);
 
 % UIWAIT makes Detail wait for user response (see UIRESUME)
-% uiwait(handles.figure1);
+% uiwait(handles.detail);
+
+h = findobj('Tag', 'forensic');
+
+if ~isempty(h)
+    forensic_data = guidata(h);
+    
+    axes(handles.fig_segmentation);
+    imshow(forensic_data.resultMask);
+end
 
 
 % --- Outputs from this function are returned to the command line.

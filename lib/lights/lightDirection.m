@@ -10,7 +10,7 @@ function [L, theta, normals, vertices] = lightDirection(object, grayImage, varar
     parser = inputParser;
     addRequired(parser, 'object', @islogical);
     addRequired(parser, 'grayImage', @isGrayscale);
-    addOptional(parser, 'lambda', defaultLambda, @isnumeric);
+    addParameter(parser, 'lambda', defaultLambda, @isnumeric);
     addParameter(parser, 'nPoints', defaultNPoints, @isnumeric);
     addParameter(parser, 'numGaps', defaultNumGaps, @isnumeric);
     addParameter(parser, 'offset', defaultOffset, @isnumeric);

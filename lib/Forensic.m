@@ -22,7 +22,7 @@ function varargout = Forensic(varargin)
 
 % Edit the above text to modify the response to help Forensic
 
-% Last Modified by GUIDE v2.5 10-Dec-2019 11:47:42
+% Last Modified by GUIDE v2.5 10-Dec-2019 18:30:13
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -59,7 +59,7 @@ handles.output = hObject;
 guidata(hObject, handles);
 
 % UIWAIT makes Forensic wait for user response (see UIRESUME)
-% uiwait(handles.figure1);
+% uiwait(handles.forensic);
 
 
 % --- Outputs from this function are returned to the command line.
@@ -107,7 +107,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-
 % --- Executes on button press in btn_deteksi.
 function btn_deteksi_Callback(hObject, eventdata, handles)
 % hObject    handle to btn_deteksi (see GCBO)
@@ -115,9 +114,12 @@ function btn_deteksi_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 global image;
 global label;
+global mask;
+
 % resize image into half
 imgResize = imresize(image, 0.5);
 % segment image using meanshift
+disp('Segmenting image...');
 [obj, gray, mask, params] = imsegment(imgResize, ...
     'segType', 'meanshift', ...
     'SpatialBandWidth', 3, ...
@@ -125,12 +127,14 @@ imgResize = imresize(image, 0.5);
     'gamma', 0.32, ...
     'numberToExtract', 2, ...
     'sizeThreshold', 500);
+
 % calculate complex lighting environment
 lights = {};
 listDegree = [];
+disp('Estimating light direction..');
 for i = 1:size(obj,2)
-    [light, degree, normals, vertices] = lightDirection(obj{i}, ...
-        'modelType', 'complex');
+    [light, degree, normals, vertices] = lightDirection(obj{i}, gray{i}, ...
+                'modelType', 'complex');
     lights{end+1} = light;
     listDegree = [listDegree; degree];
 end
@@ -148,13 +152,39 @@ degreeCorrelation(1) = sigmoidLeft(corrLight, 0.15, 0.23, 0.3);
 degreeCorrelation(2) = sigmoidRight(corrLight, 0.24, 0.4, 0.8);
 degreeTheta(1) = sigmoidLeft(diffLight, 45, 57, 92);
 degreeTheta(2) = sigmoidRight(diffLight, 81, 105, 135);
-[predicted, degreeForgey, degreeAuthentic] = rule(degreeCorrelation, degreeTheta);
+[predicted, degreeForgery, degreeAuthentic] = rule(degreeCorrelation, degreeTheta);
+
+% setup the gui
+set(handles.text_theta, 'String', num2str(diffLight));
+set(handles.text_correlation, 'String', num2str(corrLight));
+set(handles.text_authentic, 'String', num2str(degreeAuthentic));
+set(handles.text_forgery, 'String', num2str(degreeForgery));
+
+if (predicted == 1)
+    set(handles.text_predict, 'String', 'Tidak terindikasi manipulasi');
+elseif (predicted == 0)
+    set(handles.text_predict, 'String', 'Terindikasi manipulasi');
+end
+
+if (predicted == 1 & label == 1)
+    set(handles.text_status, 'String', 'True Positive');
+elseif (predicted == 1 & label == 0)
+    set(handles.text_status, 'String', 'False Positive');
+elseif (predicted == 0 & label == 0)
+    set(handles.text_status, 'String', 'True Negative');
+elseif (predicted == 0 & label == 1)
+    set(handles.text_status, 'String', 'False Negative');
+end
 
 % --- Executes on button press in btn_detail.
 function btn_detail_Callback(hObject, eventdata, handles)
 % hObject    handle to btn_detail (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+global mask;
+handles.resultMask = mask;
+guidata(hObject, handles);
+
 Detail
 
 % --- Executes on button press in btn_load.
@@ -175,4 +205,9 @@ function btn_reset_Callback(hObject, eventdata, handles)
 % hObject    handle to btn_reset (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+initialText = '-';
 cla(handles.fig_image);
+set(handles.text_actual, 'String', initialText);
+set(handles.text_predict, 'String', initialText);
+set(handles.text_status, 'String', initialText);
+set(handles.popup_label, 'Value', 1);
