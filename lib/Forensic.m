@@ -108,14 +108,20 @@ function btn_detail_Callback(hObject, eventdata, handles)
 % hObject    handle to btn_detail (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
+Detail
 
 % --- Executes on button press in btn_load.
 function btn_load_Callback(hObject, eventdata, handles)
 % hObject    handle to btn_load (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+global image;
+[filename, path] = uigetfile({'*.png;*.jpg;*.tif','Image Files'});
+image = imread(fullfile(path,filename));
 
+% showing image in figure
+axes(handles.fig_image);
+imshow(image);
 
 % --- Executes on button press in btn_reset.
 function btn_reset_Callback(hObject, eventdata, handles)
