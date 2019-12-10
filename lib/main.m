@@ -1,16 +1,16 @@
 clear; clc; close all;
 
-% listData = dir('observationData/*.mat');
-% listData = dir('pengujian/sumber_cahaya/*.mat');
-% listData = dir('pengujian/rotasi/*.mat');
-listData = dir('pengujian/scaling/*.mat');
+% listData = dir('pengujian/all/sumber_cahaya/*.mat');
+listData = dir('pengujian/all/rotasi/*.mat');
+% listData = dir('pengujian/all/scaling/*.mat');
 for numData = 1:size(listData,1)
     disp(['Assesing file : ', listData(numData).name]);
     % load every observation data
     load(fullfile(listData(numData).folder, listData(numData).name));
+    % change categorical label into binary label
+    labels = imds.Labels == 'authentic';
     
     % call main logic here
-    labels = imds.Labels;
     predicts = [];
     probability = [];
     for i = 1:size(imds.Files,1)
@@ -87,13 +87,6 @@ for numData = 1:size(listData,1)
     plot(c,c,'--');
     hold on;
     plot(FPR, TPR, 'LineWidth', 2);
-    title('ROC Curve - Distorsi Scaling');
-    legend('2 Sumber Cahaya', '3 Sumber Cahaya', '4 Sumber Cahaya');
-    
-%     if (mod(numData,3) == 0)
-%         saveas(gca, fullfile('../../pengujian', strcat(listData(numData).name, '.jpg')));
-%         
-%         % close figure
-%         close all;
-%     end
+    title('ROC Curve - Distorsi Rotasi');
 end
+legend('2 Sumber Cahaya', '3 Sumber Cahaya', '4 Sumber Cahaya');

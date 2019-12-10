@@ -19,21 +19,21 @@ for i = 1:size(listFolder,1)
                 disp(currentSubFolders);
                 
                 % load dataset into imageDataStore
-                dataset = imageDatastore(currentSubFolders, ...
+                imds = imageDatastore(currentSubFolders, ...
                     'IncludeSubfolders', true, ...
                     'LabelSource', 'foldernames');
                 
-                labelCounter = countEachLabel(dataset);
+                labelCounter = countEachLabel(imds);
                 disp(labelCounter);
                 
                 % store dataset into appropriate folder
                 switch listFolder{i}
                     case 'rotasi'
-                        save(fullfile('pengujian/all/rotasi/', strcat(subFolder, '-lights-', 'rotasi.mat')), 'dataset');
+                        save(fullfile('pengujian/all/rotasi/', strcat(subFolder, '-lights-', 'rotasi.mat')), 'imds');
                     case 'scaling'
-                        save(fullfile('pengujian/all/scaling/', strcat(subFolder, '-lights-', 'scaling.mat')), 'dataset');
+                        save(fullfile('pengujian/all/scaling/', strcat(subFolder, '-lights-', 'scaling.mat')), 'imds');
                     case 'sumber cahaya'
-                        save(fullfile('pengujian/all/sumber_cahaya/', strcat(subFolder, '-lights', '.mat')), 'dataset');
+                        save(fullfile('pengujian/all/sumber_cahaya/', strcat(subFolder, '-lights', '.mat')), 'imds');
                 end
             end
         end
