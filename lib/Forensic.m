@@ -115,6 +115,7 @@ function btn_deteksi_Callback(hObject, eventdata, handles)
 global image;
 global label;
 global mask;
+global gray;
 
 % resize image into half
 imgResize = imresize(image, 0.5);
@@ -182,7 +183,10 @@ function btn_detail_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 global mask;
+global gray;
 handles.resultMask = mask;
+handles.resultGray = gray;
+
 guidata(hObject, handles);
 
 Detail

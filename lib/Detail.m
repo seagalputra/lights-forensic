@@ -68,6 +68,12 @@ if ~isempty(h)
     
     axes(handles.fig_segmentation);
     imshow(forensic_data.resultMask);
+    
+    axes(handles.fig_object1);
+    imshow(forensic_data.resultGray{1});
+    
+    axes(handles.fig_object2);
+    imshow(forensic_data.resultGray{2});
 end
 
 
