@@ -1,4 +1,4 @@
-function theta = getPrincipalLight(N, intensity, lambda)
+function [theta, v] = getPrincipalLight(N, intensity, lambda)
 
 % for Y(1,-1) SH
 Y1{1} = @(y) sqrt((3/4.*pi).*y);

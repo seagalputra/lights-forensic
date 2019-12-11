@@ -28,7 +28,7 @@ shading = 1*(shading-min(shading))/range(shading);
 shading = max(0, min(1, shading));
 
 if show
-    figure;
+    % figure;
     trisurf(faces,vertices(:,1),vertices(:,2),vertices(:,3), shading,...
         'edgecolor', 'none', 'facecolor', 'interp');
     colormap gray;
@@ -36,6 +36,6 @@ if show
     xlabel('x');
     ylabel('y');
     zlabel('z');
-    view(0, 0);
+    view(0, -90);
     axis off;
 end

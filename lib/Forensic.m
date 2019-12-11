@@ -116,6 +116,10 @@ global image;
 global label;
 global mask;
 global gray;
+global params;
+global listNormals;
+global listVertices;
+global lights;
 
 % resize image into half
 imgResize = imresize(image, 0.5);
@@ -132,12 +136,17 @@ disp('Segmenting image...');
 % calculate complex lighting environment
 lights = {};
 listDegree = [];
+listNormals = {};
+listVertices = {};
 disp('Estimating light direction..');
 for i = 1:size(obj,2)
     [light, degree, normals, vertices] = lightDirection(obj{i}, gray{i}, ...
                 'modelType', 'complex');
     lights{end+1} = light;
     listDegree = [listDegree; degree];
+    
+    listNormals{end+1} = normals;
+    listVertices{end+1} = vertices;
 end
 % compute correlation between several lighting condition
 possibleLights = nchoosek(lights,2);
@@ -184,8 +193,17 @@ function btn_detail_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 global mask;
 global gray;
+global params;
+global listNormals;
+global listVertices;
+global lights;
+
 handles.resultMask = mask;
 handles.resultGray = gray;
+handles.parameter = params;
+handles.surfaceNormals = listNormals;
+handles.listVertices = listVertices;
+handles.listLights = lights;
 
 guidata(hObject, handles);
 

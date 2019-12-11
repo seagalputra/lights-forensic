@@ -69,13 +69,31 @@ if ~isempty(h)
     axes(handles.fig_segmentation);
     imshow(forensic_data.resultMask);
     
+    % plot surface normal for first object
     axes(handles.fig_object1);
     imshow(forensic_data.resultGray{1});
+    hold on;
+    plot([forensic_data.listVertices{1}(:,1) forensic_data.listVertices{1}(:,1)+10*forensic_data.surfaceNormals{1}(:,1)]', ...
+        [forensic_data.listVertices{1}(:,2) forensic_data.listVertices{1}(:,2)+10*forensic_data.surfaceNormals{1}(:,2)]');
     
+    % plot surface normal for second object
     axes(handles.fig_object2);
     imshow(forensic_data.resultGray{2});
+    hold on;
+    plot([forensic_data.listVertices{2}(:,1) forensic_data.listVertices{2}(:,1)+10*forensic_data.surfaceNormals{2}(:,1)]', ...
+        [forensic_data.listVertices{2}(:,2) forensic_data.listVertices{2}(:,2)+10*forensic_data.surfaceNormals{2}(:,2)]');
+    
+    % plot lambertian sphere
+    firstCoeff = forensic_data.listLights{1};
+    firstCoeff(6:9,:) = 0;
+    axes(handles.fig_light1);
+    firstShading = plotLitSphere2(firstCoeff, 4, 1);
+    
+    secondCoeff = forensic_data.listLights{2};
+    secondCoeff(6:9,:) = 0;
+    axes(handles.fig_light2);
+    secondShading = plotLitSphere2(secondCoeff, 4, 1);
 end
-
 
 % --- Outputs from this function are returned to the command line.
 function varargout = Detail_OutputFcn(hObject, eventdata, handles) 

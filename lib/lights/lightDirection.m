@@ -78,7 +78,7 @@ function [v, theta, normals, vertices] = lightComplex(object, grayImage, lambda,
     C = diag([1, 2, 2, 3, 3]);
     v = solveEstComplex(M, C, intBoundary, lambda);
     % get principal light direction
-    theta = getPrincipalLight(normals, intBoundary, lambda);
+    [theta, ~] = getPrincipalLight(normals, intBoundary, lambda);
 end
 
 function checkGray = isGrayscale(gray)
