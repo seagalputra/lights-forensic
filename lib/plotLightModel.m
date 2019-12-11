@@ -39,15 +39,10 @@ end
 firstCoeff = lights{1};
 firstCoeff(6:9,:) = 0;
 
-figure,
-imshow(gray{1});
-% plotLitSphere(firstCoeff);
-shading = plotLitSphere2(firstCoeff, 4, 1);
-
 secondCoeff = lights{2};
 secondCoeff(6:9,:) = 0;
 
-figure,
-imshow(gray{2});
-% plotLitSphere(secondCoeff);
-shading = plotLitSphere2(secondCoeff, 4, 1);
+subplot(221), imshow(gray{1});
+subplot(222), shading = plotLitSphere2(firstCoeff, 4, 1);
+subplot(223), imshow(gray{2});
+subplot(224), shading = plotLitSphere2(secondCoeff, 4, 1);
