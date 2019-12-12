@@ -1,8 +1,10 @@
 clear; clc; close all;
 
-% listData = dir('pengujian/all/sumber_cahaya/*.mat');
-% listData = dir('pengujian/all/rotasi/*.mat');
-listData = dir('pengujian/all/scaling/*.mat');
+path = 'pengujian\all\sumber_cahaya\*.mat';
+% path = 'pengujian\all\rotasi\*.mat';
+% path = 'pengujian\all\scaling\*.mat';
+
+listData = dir(path);
 for numData = 1:size(listData,1)
     disp(['Assesing file : ', listData(numData).name]);
     % load every observation data
@@ -13,10 +15,17 @@ for numData = 1:size(listData,1)
     % call main logic here
     predicts = [];
     probability = [];
+    features = [];
+    listFilename = {};
     for i = 1:size(imds.Files,1)
         disp(num2str(i));
+        filePath = imds.Files{i};
+        filePathSplit = strsplit(filePath, '\');
+        filename = filePathSplit{end};
+        listFilename{end+1} = filename;
+        
         % load image
-        img = imread(imds.Files{i});
+        img = imread(filePath);
         img = imresize(img, 0.5);
 
         % segement image using meanshift
@@ -47,6 +56,9 @@ for numData = 1:size(listData,1)
         % compute different between principal light direction
         possibleDegree = nchoosek(listDegree,2);
         diffLight = abs(possibleDegree(:,2) - possibleDegree(:,1));
+        
+        % store every attribute in features
+        features = [features; corrLight, diffLight];
     
         % membership function 1
         degreeCorrelation(1) = sigmoidLeft(corrLight, 0.15, 0.23, 0.3); % low
@@ -60,6 +72,14 @@ for numData = 1:size(listData,1)
         predicts = [predicts; predicted];
         probability = [probability; degreeForgery, degreeAuthentic];
     end
+    
+    % saving predicts data and features in table
+    colNames = {'Filename', 'Features', 'Labels', 'Predicts'};
+    T = table(listFilename', features, labels, predicts, 'VariableNames', colNames);
+    splitPath = strsplit(path, '\');
+    folderName = splitPath{3};
+    
+    writetable(T, fullfile('..\..\report_table\', folderName, strcat(num2str(numData), '.xlsx')));
     
     % create performance model analysis using ROC curve
     [FPR, TPR, T, AUC] = perfcurve(labels, probability(:,2), 1);
