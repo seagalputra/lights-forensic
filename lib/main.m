@@ -79,7 +79,7 @@ for numData = 1:size(listData,1)
     splitPath = strsplit(path, '\');
     folderName = splitPath{3};
     
-    writetable(T, fullfile('..\..\report_table\', folderName, strcat(num2str(numData), '.xlsx')));
+    writetable(T, fullfile('..\..\report_table\', folderName, strcat(num2str(numData+1), '.xlsx')));
     
     % create performance model analysis using ROC curve
     [FPR, TPR, T, AUC] = perfcurve(labels, probability(:,2), 1);
@@ -107,6 +107,6 @@ for numData = 1:size(listData,1)
     plot(c,c,'--');
     hold on;
     plot(FPR, TPR, 'LineWidth', 2);
-    title('ROC Curve - Distorsi Scaling');
+    title('ROC Curve - Distorsi Rotasi');
 end
 legend('2 Sumber Cahaya', '3 Sumber Cahaya', '4 Sumber Cahaya');

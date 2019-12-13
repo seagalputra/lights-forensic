@@ -1,10 +1,8 @@
 clear; clc; close all;
 
-clear; clc; close all;
-
-path = 'pengujian\all\sumber_cahaya\*.mat';
+% path = 'pengujian\all\sumber_cahaya\*.mat';
 % path = 'pengujian\all\rotasi\*.mat';
-% path = 'pengujian\all\scaling\*.mat';
+path = 'pengujian\all\scaling\*.mat';
 
 listData = dir(path);
 for numData = 1:size(listData,1)
@@ -33,6 +31,7 @@ for numData = 1:size(listData,1)
         pathSplit = strsplit(path, '\');
         folder = pathSplit{3};
         filename = fileSplit{end};
-        imwrite(mask, fullfile('binaryMask', folder, strcat(lower(filename), '.jpg')));
+        subfolder = listData(numData).name;
+        imwrite(mask, fullfile('binaryMask', folder, subfolder, lower(filename)));
     end
 end
