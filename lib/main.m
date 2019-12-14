@@ -1,14 +1,26 @@
 clear; clc; close all;
 
-path = 'pengujian\all\sumber_cahaya\*.mat';
-% path = 'pengujian\all\rotasi\*.mat';
-% path = 'pengujian\all\scaling\*.mat';
+% CHANGE THIS ENVIRONMENT VARIABLES
+APP_ENVIRONMENT='training';
+TYPE = 'sumber_cahaya';
+
+if (strcmp(APP_ENVIRONMENT, 'training'))
+    folderName = 'pengamatan';
+    path = fullfile('datastore', folderName, TYPE, '*.mat');
+elseif (strcmp(APP_ENVIRONMENT, 'testing'))
+    folderName = 'pengujian';
+    path = fullfile('datastore', folderName, TYPE, '*.mat');
+end
 
 listData = dir(path);
 for numData = 1:size(listData,1)
     disp(['Assesing file : ', listData(numData).name]);
     % load every observation data
     load(fullfile(listData(numData).folder, listData(numData).name));
+    
+    % evaluate a function
+    eval(strcat('imds = ', APP_ENVIRONMENT));
+    
     % change categorical label into binary label
     labels = imds.Labels == 'authentic';
     
@@ -60,13 +72,13 @@ for numData = 1:size(listData,1)
         % store every attribute in features
         features = [features; corrLight, diffLight];
     
-        % membership function 1
-        degreeCorrelation(1) = sigmoidLeft(corrLight, 0.15, 0.23, 0.3); % low
-        degreeCorrelation(2) = sigmoidRight(corrLight, 0.24, 0.4, 0.8); % high
+        % distance correlation membership function
+        degreeCorrelation(1) = sigmoidLeft(corrLight, 0.15, 0.23 , 0.3); % low
+        degreeCorrelation(2) = sigmoidRight(corrLight, 0.4, 0.54, 0.7); % high
         
-        % membership function 2
-        degreeTheta(1) = sigmoidLeft(diffLight, 45, 57, 92); % low
-        degreeTheta(2) = sigmoidRight(diffLight, 81, 105, 135); % high
+        % theta membership function
+        degreeTheta(1) = sigmoidLeft(diffLight, 25, 35, 50); % low
+        degreeTheta(2) = sigmoidRight(diffLight, 45, 105, 240); % high
     
         [predicted, degreeForgery, degreeAuthentic] = rule(degreeCorrelation, degreeTheta);
         predicts = [predicts; predicted];
@@ -75,11 +87,11 @@ for numData = 1:size(listData,1)
     
     % saving predicts data and features in table
     colNames = {'Filename', 'Features', 'Labels', 'Predicts'};
-    T = table(listFilename', features, labels, predicts, 'VariableNames', colNames);
+    T = table(listFilename', features, double(labels), predicts, 'VariableNames', colNames);
     splitPath = strsplit(path, '\');
-    folderName = splitPath{3};
+    subfolder = splitPath{3};
     
-    writetable(T, fullfile('..\..\report_table\', folderName, strcat(num2str(numData+1), '.xlsx')));
+    writetable(T, fullfile('..\..\report_table\', folderName, subfolder, strcat(num2str(numData+1), '.xlsx')));
     
     % create performance model analysis using ROC curve
     [FPR, TPR, T, AUC] = perfcurve(labels, probability(:,2), 1);
@@ -107,6 +119,6 @@ for numData = 1:size(listData,1)
     plot(c,c,'--');
     hold on;
     plot(FPR, TPR, 'LineWidth', 2);
-    title('ROC Curve - Distorsi Rotasi');
+    title('ROC Curve - Pengamatan Data');
 end
 legend('2 Sumber Cahaya', '3 Sumber Cahaya', '4 Sumber Cahaya');

@@ -3,9 +3,7 @@ addpath('lights');
 addpath('segmentation');
 addpath('segmentation/meanshift');
 addpath('membership');
-addpath('observationData');
-addpath('features');
-addpath('pengujian');
+addpath('datastore');
 
 % import mexopencv module for opencv binding
 % addpath('C:\dev\mexopencv');

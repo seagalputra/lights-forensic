@@ -2,7 +2,7 @@ clear; clc; close all;
 
 % If you wanna load another data, please change this variable into specific
 % path of your dataset folder.
-path = '../../pengujian-all';
+path = '../../dataset';
 listFolder = cellstr(ls(path));
 
 for i = 1:size(listFolder,1)
@@ -29,11 +29,11 @@ for i = 1:size(listFolder,1)
                 % store dataset into appropriate folder
                 switch listFolder{i}
                     case 'rotasi'
-                        save(fullfile('pengujian/all/rotasi/', strcat(subFolder, '-lights-', 'rotasi.mat')), 'imds');
+                        save(fullfile('datastore/all/rotasi/', strcat(subFolder, '-lights-', 'rotasi.mat')), 'imds');
                     case 'scaling'
-                        save(fullfile('pengujian/all/scaling/', strcat(subFolder, '-lights-', 'scaling.mat')), 'imds');
+                        save(fullfile('datastore/all/scaling/', strcat(subFolder, '-lights-', 'scaling.mat')), 'imds');
                     case 'sumber cahaya'
-                        save(fullfile('pengujian/all/sumber_cahaya/', strcat(subFolder, '-lights', '.mat')), 'imds');
+                        save(fullfile('datastore/all/sumber_cahaya/', strcat(subFolder, '-lights', '.mat')), 'imds');
                 end
             end
         end

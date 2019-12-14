@@ -1,6 +1,6 @@
 clear; clc; close all;
 
-path = 'pengujian\all\sumber_cahaya\*.mat';
+path = 'datastore\all\sumber_cahaya\*.mat';
 
 listData = dir(path);
 for num = 1:size(listData,1)
@@ -12,6 +12,6 @@ for num = 1:size(listData,1)
     [training, testing] = splitEachLabel(imds, 0.6);
     
     % save splitted dataset into folder
-    save(fullfile('pengamatan', filename), 'training');
-    save(fullfile('pengujian\final', filename), 'testing');
+    save(fullfile('datastore\pengamatan\sumber_cahaya', filename), 'training');
+    save(fullfile('datastore\pengujian\sumber_cahaya', filename), 'testing');
 end
