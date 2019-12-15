@@ -2,7 +2,7 @@ clear; clc; close all;
 
 % CHANGE THIS ENVIRONMENT VARIABLES
 APP_ENVIRONMENT='testing';
-TYPE='rotasi';
+TYPE='scaling';
 
 if (strcmp(APP_ENVIRONMENT, 'training'))
     folderName = 'pengamatan';
@@ -120,6 +120,6 @@ for numData = 1:size(listData,1)
     plot(c,c,'--');
     hold on;
     plot(FPR, TPR, 'LineWidth', 2);
-    title('ROC Curve - Distorsi Rotasi');
+    title('ROC Curve - Distorsi Scaling');
 end
 legend('2 Sumber Cahaya', '3 Sumber Cahaya', '4 Sumber Cahaya');
