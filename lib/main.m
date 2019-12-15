@@ -1,8 +1,8 @@
 clear; clc; close all;
 
 % CHANGE THIS ENVIRONMENT VARIABLES
-APP_ENVIRONMENT='training';
-TYPE = 'sumber_cahaya';
+APP_ENVIRONMENT='testing';
+TYPE='rotasi';
 
 if (strcmp(APP_ENVIRONMENT, 'training'))
     folderName = 'pengamatan';
@@ -13,6 +13,7 @@ elseif (strcmp(APP_ENVIRONMENT, 'testing'))
 end
 
 listData = dir(path);
+disp(folderName);
 for numData = 1:size(listData,1)
     disp(['Assesing file : ', listData(numData).name]);
     % load every observation data
@@ -74,11 +75,11 @@ for numData = 1:size(listData,1)
     
         % distance correlation membership function
         degreeCorrelation(1) = sigmoidLeft(corrLight, 0.15, 0.23 , 0.3); % low
-        degreeCorrelation(2) = sigmoidRight(corrLight, 0.4, 0.54, 0.7); % high
+        degreeCorrelation(2) = sigmoidRight(corrLight, 0.24, 0.4, 0.8); % high
         
         % theta membership function
-        degreeTheta(1) = sigmoidLeft(diffLight, 25, 35, 50); % low
-        degreeTheta(2) = sigmoidRight(diffLight, 45, 105, 240); % high
+        degreeTheta(1) = sigmoidLeft(diffLight, 45, 57, 92); % low
+        degreeTheta(2) = sigmoidRight(diffLight, 81, 105, 135); % high
     
         [predicted, degreeForgery, degreeAuthentic] = rule(degreeCorrelation, degreeTheta);
         predicts = [predicts; predicted];
@@ -119,6 +120,6 @@ for numData = 1:size(listData,1)
     plot(c,c,'--');
     hold on;
     plot(FPR, TPR, 'LineWidth', 2);
-    title('ROC Curve - Pengamatan Data');
+    title('ROC Curve - Distorsi Rotasi');
 end
 legend('2 Sumber Cahaya', '3 Sumber Cahaya', '4 Sumber Cahaya');
