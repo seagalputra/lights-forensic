@@ -108,12 +108,12 @@ for numData = 1:size(listData,1)
     disp(['Accuracy                     : ', num2str(100*(TP+TN)/(TP+TN+FP+FN)), ' %']);
     disp(['True Positive Rate           : ', num2str(100*TP/(TP+FN)), ' %']);
     disp(['False Positive Rate          : ', num2str(100*FP/(FP+TN)), ' %']);
-    % disp(['True Negative Rate           : ', num2str(100*TN/(TN+FP)), ' %']);
-    % disp(['False Negative Rate          : ', num2str(100*FN/(FN+TP)), ' %']);
-    % disp(['Positive Predictive Value    : ', num2str(100*TP/(TP+FP)), ' %']);
-    % disp(['Negative Predictive Value    : ', num2str(100*TN/(TN+FN)), ' %']);    
-    % disp(['False Discovery Rate         : ', num2str(100*FP/(FP+TP)), ' %']);
-    % disp(['False Omission Rate          : ', num2str(100*FN/(FN+TN)), ' %']);
+    disp(['True Negative Rate           : ', num2str(100*TN/(TN+FP)), ' %']);
+    disp(['False Negative Rate          : ', num2str(100*FN/(FN+TP)), ' %']);
+    disp(['Positive Predictive Value    : ', num2str(100*TP/(TP+FP)), ' %']);
+    disp(['Negative Predictive Value    : ', num2str(100*TN/(TN+FN)), ' %']);    
+    disp(['False Discovery Rate         : ', num2str(100*FP/(FP+TP)), ' %']);
+    disp(['False Omission Rate          : ', num2str(100*FN/(FN+TN)), ' %']);
     disp('----------------------------------------------------------');
     
     c = linspace(0,1);
