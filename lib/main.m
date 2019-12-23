@@ -1,8 +1,8 @@
 clear; clc; close all;
 
 % CHANGE THIS ENVIRONMENT VARIABLES
-APP_ENVIRONMENT='testing';
-TYPE='scaling';
+APP_ENVIRONMENT='all';
+TYPE='sumber_cahaya';
 
 if (strcmp(APP_ENVIRONMENT, 'training'))
     folderName = 'pengamatan';
@@ -10,6 +10,9 @@ if (strcmp(APP_ENVIRONMENT, 'training'))
 elseif (strcmp(APP_ENVIRONMENT, 'testing'))
     folderName = 'pengujian';
     path = fullfile('datastore', folderName, TYPE, '*.mat');
+elseif (strcmp(APP_ENVIRONMENT, 'all'))
+    folderName = 'all';
+    path = fullfile('datastore', folderName, '*.mat');
 end
 
 listData = dir(path);
@@ -20,10 +23,10 @@ for numData = 1:size(listData,1)
     load(fullfile(listData(numData).folder, listData(numData).name));
     
     % evaluate a function
-    eval(strcat('imds = ', APP_ENVIRONMENT));
+    % eval(strcat('imds = ', APP_ENVIRONMENT));
     
     % change categorical label into binary label
-    labels = imds.Labels == 'authentic';
+    labels = imds.Labels == 'fake';
     
     % call main logic here
     predicts = [];
@@ -92,13 +95,14 @@ for numData = 1:size(listData,1)
     splitPath = strsplit(path, '\');
     subfolder = splitPath{3};
     
-    writetable(T, fullfile('..\..\report_table\', folderName, subfolder, strcat(num2str(numData+1), '.xlsx')));
-    
+    % writetable(T, fullfile('..\..\report_table\', folderName, subfolder, strcat(num2str(numData+1), '.xlsx')));
+     
     % create performance model analysis using ROC curve
-    [FPR, TPR, T, AUC] = perfcurve(labels, probability(:,2), 1);
+    [FPR, TPR, T, AUC] = perfcurve(labels, probability(:,2), 0);
     
-    threshold = 0.7;
-    pred = (probability(:,2)>=threshold);
+    % threshold = 0.7;
+    % pred = (probability(:,2)>=threshold);
+    pred = predicts;
     TP = sum(pred == 1 & labels == 1);
     FP = sum(pred == 1 & labels == 0);
     TN = sum(pred == 0 & labels == 0);
@@ -120,6 +124,8 @@ for numData = 1:size(listData,1)
     plot(c,c,'--');
     hold on;
     plot(FPR, TPR, 'LineWidth', 2);
-    title('ROC Curve - Distorsi Scaling');
+    title('ROC Curve - Seluruh Sumber Cahaya');
 end
-legend('2 Sumber Cahaya', '3 Sumber Cahaya', '4 Sumber Cahaya');
+legend('Distorsi Rotasi', 'Distorsi Scaling', 'Tanpa Post-processing', 'Location', 'best');
+% legend('Sumber Cahaya', 'Distorsi Rotasi', 'Distorsi Scaling', 'Location', 'best');
+% legend('2 Sumber Cahaya', '3 Sumber Cahaya', '4 Sumber Cahaya', 'Location', 'best');
